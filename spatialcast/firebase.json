@@ -1,0 +1,18 @@
+{
+  "hosting": [{
+    "site": "volumetric-streaming-dev",
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "js/point_cloud_live_obfs.js",
+      "js/point_cloud_vod_obfs.js",
+      "js/previewPlayer_obfs.js",
+      "js/livePlayer_obfs.js",
+      "js/vodPlayer_obfs.js",
+      "vids"
+    ]
+    }]
+  }
+  

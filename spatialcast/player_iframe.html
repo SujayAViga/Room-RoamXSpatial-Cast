@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>SpatialCast Player</title>
+        <link rel="stylesheet" href="./css/output1.css">
+        <link href="https://fonts.googleapis.com/css2?family=Sono:wght@500&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Teko:wght@300&display=swap" rel="stylesheet">
+    </head>
+    <body style="width: 100%; height: 98%;">
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <div class="header">
+            <p>SpatialCast</p>
+        </div>
+        <div class="version">
+            <p>V:4.0</p>
+        </div>
+        </div>
+        <div class="rotate-notify"><p>Please Rotate your phone</p></div>
+        <div class="iframe-container">
+            <iframe class="iframe" id="showurl" src="" scrolling="no" allowfullscreen></iframe>
+        </div>
+        <div id="instruc" class="instructions" style="padding: 0px 8px;">
+            <div class="rotation">
+                <p>Press Left mouse button. Move mouse to Rotate</p>
+            </div>
+            <div class="move">
+                <p>Press Right mouse button. Move mouse to Move</p>
+            </div>
+            <div class="zoom">
+                <p>Use Mouse Scroll to zoom in/out</p>
+            </div>
+        </div>
+
+        <script>
+            const urlParams = new URLSearchParams(window.location.search);
+            let geturl = urlParams.get('streamid');
+            let getPlayer = urlParams.get('player');
+            
+            if (getPlayer == 'live') {
+                document.getElementById("showurl").src = `players/liveView.html?streamid=${geturl}&showControl=false`;
+            } else if (getPlayer == 'vod') {
+                document.getElementById("showurl").src = `players/vodView.html?streamid=${geturl}&showControl=false`;
+            } else {
+                alert('No player selected!');
+            }
+        </script>
+        <script>
+            const instruction = document.getElementById('instruc');
+            const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/.test(navigator.userAgent);
+            if (mobile) {
+                instruction.style.display = 'none';
+            }
+        </script>
+        <script>
+            const iframe = document.getElementById('showurl');
+            window.addEventListener('message', (event) => {
+                if (event.data === 'requestFullscreen') {
+                    if (iframe.requestFullscreen) {
+                        iframe.requestFullscreen();
+                    }else if (iframe.mozRequestFullScreen) {
+                        iframe.mozRequestFullScreen();
+                    }else if (iframe.webkitRequestFullScreen) {
+                        iframe.webkitRequestFullscreen();
+                    }else if (iframe.msRequestFullscreen) {
+                        iframe.msRequestFullscreen();
+                    }
+                }
+                else if (event.data === 'exitFullscreen') {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.mozCancelFullScreen) {
+                        document.mozCancelFullScreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                    }
+                }
+            })
+        </script>
+    </body>
+</html>

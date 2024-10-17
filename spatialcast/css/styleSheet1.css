@@ -1,0 +1,139 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100%;
+    font-family: "Sono", sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.version {
+    font-size: 1vw;
+    margin-top: -40px;
+}
+.iframe-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: 90vh;
+}
+.iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+.instructions {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+.rotation, .move, .zoom {
+    font-size: 1.5vw;
+    font-family: "Teko", sans-serif;
+    margin: 0;
+}
+.rotation {
+    justify-content: flex-start;
+}
+.move {
+    justify-content: center;
+}
+.zoom {
+    justify-content: flex-end;
+}
+.rotate-notify {
+    display: none;
+}
+@media (max-width: 1920px) {
+    .iframe-container {
+        height: 90%;
+        width: 100%;
+    }
+    .header {
+        font-size: 30px;
+    }
+    .version {
+        font-size: 15px;
+        margin-top: 0px;
+    }
+    .rotation, .move, .zoom {
+        font-size: 1.5vw;
+    }
+    .rotate-notify {
+        display: none;
+    }
+}
+@media (max-width: 1024px) {
+    .iframe-container {
+        height: 90%;
+        width: 100%;
+    }
+    .header {
+        font-size: 26px;
+    }
+    .version {
+        font-size: 12px;
+        margin-top: 15px;
+    }
+    .rotation, .move, .zoom {
+        font-size: 1.5vw;
+    }
+    .rotate-notify {
+        display: none;
+    }
+}
+@media (max-width: 935px) {
+    .iframe-container {
+        height: 100%;
+        width: 100%;
+    }
+    .header {
+        font-size: 26px;
+        display: none;
+    }
+    .version {
+        font-size: 12px;
+        margin-top: 15px;
+        display: none;
+    }
+    .rotation, .move, .zoom {
+        font-size: 16px;
+    }
+    .rotate-notify {
+        display: none;
+    }
+}
+@media (max-width: 480px) {
+    .iframe-container {
+        height: 90vh;
+        width: 95%;
+    }
+    .header {
+        font-size: 18px;
+        display: none;
+    }
+    .version {
+        font-size: 12px;
+        margin-top: 8px;
+        display: none;
+    }
+    .rotation, .move, .zoom {
+        font-size: 12px;
+    }
+    .rotate-notify {
+      top: 100px;
+      position: fixed;
+      height: 60vh;
+      width: 95%;
+      background-color: black;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+}
