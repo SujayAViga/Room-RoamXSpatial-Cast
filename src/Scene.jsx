@@ -402,7 +402,7 @@ function Scene() {
       )}
       <ambientLight />
       <Splat
-        src="room.splat"
+        src="https://huggingface.co/datasets/sujayA7299/Splat-data/resolve/main/CircularHall.splat"
         chunkSize={0.005}
         rotation={[inclination.x, inclination.y, -inclination.z]}
       />
