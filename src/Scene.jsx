@@ -414,9 +414,7 @@ function Scene() {
         rotation={[0, Math.PI / 2.7, 0]}
         scale={0.1}
         style={{ userSelect: "none" }}
-        castShadow
-        receiveShadow
-        occlude="blending"
+        // fullscreen
         transform
         lookAt={[0, 0, 0]}
       >
@@ -424,16 +422,28 @@ function Scene() {
           id="showurl"
           title="embed"
           width={1000}
-          height={700}
+          height={700}          
           src={
             streamid
               ? `../spatialcast/players/vodView.html?streamid=${streamid}&showControl=false`
               : `../spatialcast/players/vodView.html?streamid=67f3ff3d-8dd5-4855-93af-c4da4260588a&showControl=false`
           }
-        />
+        /> 
       </Html>
-{/* 
-      {boundaryData &&
+
+      {/* <iframe
+          id="showurl"
+          title="embed"
+          width={1000}
+          height={700}          
+          src={
+            streamid
+              ? `../spatialcast/players/vodView.html?streamid=${streamid}&showControl=false`
+              : `../spatialcast/players/vodView.html?streamid=67f3ff3d-8dd5-4855-93af-c4da4260588a&showControl=false`
+          }
+        /> */}
+
+      {/* {boundaryData &&
         boundaryData.map((vertex, index) => (
           <mesh
             key={index}
