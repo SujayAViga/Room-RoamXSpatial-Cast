@@ -20,9 +20,8 @@ function Scene() {
   const [p2, setP2] = useState(null);
   const [p3, setP3] = useState(null);
   const [boundaryScale, setBoundaryScale] = useState(1);
-  const [deviceType, setDeviceType] = useState('desktop');
-  const [screenHeight, setScreenHeight] = useState('100vh');
-  const [cameraFocalLength, setCameraFocalLength] = useState(100);
+  const [deviceType, setDeviceType] = useState("desktop");
+  const [screenHeight, setScreenHeight] = useState("100vh");
 
   // read a json file
   const [boundaryData, setBoundaryData] = useState(null);
@@ -37,22 +36,27 @@ function Scene() {
   useEffect(() => {
     const detectDeviceType = () => {
       const userAgent = navigator.userAgent;
-      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent)) {
-        setDeviceType('mobile');
-        setScreenHeight('85vh')
+      if (
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          userAgent
+        )
+      ) {
+        setDeviceType("mobile");
+        setScreenHeight("85vh");
       } else {
-        setDeviceType('desktop');
-        setScreenHeight('100vh')
+        setDeviceType("desktop");
+        setScreenHeight("100vh");
       }
     };
     detectDeviceType();
     // Add event listener for orientation change, if needed
-    window.addEventListener('orientationchange', detectDeviceType);
+    window.addEventListener("orientationchange", detectDeviceType);
     return () => {
-      window.removeEventListener('orientationchange', detectDeviceType);
+      window.removeEventListener("orientationchange", detectDeviceType);
     };
   }, []);
 
+  // rotate the splat to match the normal vector
   useEffect(() => {
     if (boundaryData) {
       // Calculate centroid
@@ -78,14 +82,14 @@ function Scene() {
         boundaryData[0].y * boundaryScale
       );
       const p2 = new Vector3(
-        boundaryData[1].x * boundaryScale,
-        boundaryData[1].z * boundaryScale,
-        boundaryData[1].y * boundaryScale
+        boundaryData[5].x * boundaryScale,
+        boundaryData[5].z * boundaryScale,
+        boundaryData[5].y * boundaryScale
       );
       const p3 = new Vector3(
-        boundaryData[2].x * boundaryScale,
-        boundaryData[2].z * boundaryScale,
-        boundaryData[2].y * boundaryScale
+        boundaryData[10].x * boundaryScale,
+        boundaryData[10].z * boundaryScale,
+        boundaryData[10].y * boundaryScale
       );
 
       setP1(p1);
@@ -149,6 +153,7 @@ function Scene() {
     }
   }, [boundaryData]);
 
+  // check if a point is inside a polygon
   function isPointInPolygon(point, polygon) {
     let x = point.x,
       y = -point.y;
@@ -234,10 +239,138 @@ function Scene() {
     return null;
   }
 
+  // mobile fps
+  const [tapType, setTapType] = useState(null);
+  const [moveCamera, setMoveCamera] = useState(false);
+  const [isTouching, setIsTouching] = useState(false);
+  const [touchStart, setTouchStart] = useState({ x: 0, y: 0 });
+  const [touchEnd, setTouchEnd] = useState({ x: 0, y: 0 });
+  const [hasMoved, setHasMoved] = useState(false);
+
+  // fov change
+  // State to manage initial pinch distance and camera focal length
+  const [initialPinchDistance, setInitialPinchDistance] = useState(null);
+  const [cameraFocalLength, setCameraFocalLength] = useState(110); // Set your camera's initial focal length
+
+  // Helper function to calculate distance between two points
+  function getDistance(touches) {
+    const touch1 = touches[0];
+    const touch2 = touches[1];
+    const dx = touch1.clientX - touch2.clientX;
+    const dy = touch1.clientY - touch2.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  const [fingers, setFingers] = useState(0);
+  // Function to handle touch start
+  const handleTouchStart = (event) => {
+    setIsTouching(true);
+    setFingers(event.touches.length);
+
+    if (event.touches.length === 2) {
+      // Check if two fingers are used
+      const distance = getDistance(event.touches);
+      setInitialPinchDistance(distance);
+      // setIsTouching(true);
+    }
+
+    if (event.touches.length === 1) {
+      setTouchStart({
+        x: event.touches[0].clientX,
+        y: event.touches[0].clientY,
+      });
+      setTouchEnd({
+        x: event.touches[0].clientX,
+        y: event.touches[0].clientY,
+      });
+      setHasMoved(false);
+    }
+  };
+
+  // Function to handle touch move
+  const handleTouchMove = (event) => {
+    if (isTouching && event.touches.length === 2) {
+      const currentDistance = getDistance(event.touches);
+      if (initialPinchDistance) {
+        var scale =
+          currentDistance < initialPinchDistance
+            ? currentDistance / initialPinchDistance
+            : -currentDistance / initialPinchDistance;
+        setInitialPinchDistance(currentDistance);
+        var newFocalLength = cameraFocalLength + scale; // Adjust scale factor according to your camera setup
+        if (newFocalLength < 40) {
+          newFocalLength = 40;
+        } else if (newFocalLength > 110) {
+          newFocalLength = 110;
+        }
+        setCameraFocalLength(newFocalLength);
+      }
+    }
+
+    if (isTouching && event.touches.length === 1) {
+      const newTouchEnd = {
+        x: event.touches[0].clientX,
+        y: event.touches[0].clientY,
+      };
+      if (
+        Math.abs(newTouchEnd.x - touchStart.x) > 2 ||
+        Math.abs(newTouchEnd.y - touchStart.y) > 2
+      ) {
+        setHasMoved(true);
+      }
+      setTouchEnd(newTouchEnd);
+    }
+  };
+
+  // Function to handle touch end
+  const handleTouchEnd = (event) => {
+    setIsTouching(false);
+    setInitialPinchDistance(null);
+    setFingers(0);
+    setIsTouching(false);
+  };
+
+  const clickTimeout = useRef(null);
+
+  const handleClick = () => {
+    // Clear any existing timeout to prevent the single click action
+    if (clickTimeout.current) {
+      clearTimeout(clickTimeout.current);
+    }
+    // Set a timeout to call the single click handler after 300ms
+    clickTimeout.current = setTimeout(() => {
+      // Your single click logic here
+      if (moveCamera) {
+        setMoveCamera(false);
+        return;
+      }
+      setTapType(1);
+      setMoveCamera(true);
+    }, 200);
+  };
+
+  const handleDoubleClick = () => {
+    // Clear the timeout to prevent the single click handler from being called
+    if (clickTimeout.current) {
+      clearTimeout(clickTimeout.current);
+    }
+    // Your double click logic here
+    if (moveCamera) {
+      setMoveCamera(false);
+      return;
+    }
+    setTapType(2.5);
+    setMoveCamera(true);
+  };
+
+  useEffect(() => {
+    console.log("Inclination updated:", inclination);
+  }, [inclination]);
+
   return (
-    <Canvas>
+    <Canvas gl={{ antialias: false }} onDoubleClick={handleDoubleClick} onClick={handleClick} onTouchEnd={handleTouchEnd} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove}>
       {boundaryData && !fly && <CameraControls polygon={boundaryData} />}
-      {fly && <FlyControls rollSpeed={0.2}/>}
+      {fly && <FlyControls rollSpeed={0.2} />}
       {!fly && (
         <>
           <CameraControls polygon={boundaryData} />
@@ -268,7 +401,14 @@ function Scene() {
         />
       )}
       <ambientLight />
-      <Splat src="room.splat" rotation={[-Math.PI / 12, 0, 0]} />
+      <Splat
+        src="room.splat"
+        chunkSize={0.005}
+        rotation={[inclination.x, inclination.y, -inclination.z]}
+      />
+      <mesh ref={boxRef}></mesh>
+      <mesh ref={splatRef}></mesh>
+
       <Html
         position={[-4, 0, -1]}
         rotation={[0, Math.PI / 2.7, 0]}
@@ -278,6 +418,7 @@ function Scene() {
         receiveShadow
         occlude="blending"
         transform
+        lookAt={[0, 0, 0]}
       >
         <iframe
           id="showurl"
@@ -291,8 +432,8 @@ function Scene() {
           }
         />
       </Html>
-
-      {/* {boundaryData &&
+{/* 
+      {boundaryData &&
         boundaryData.map((vertex, index) => (
           <mesh
             key={index}
